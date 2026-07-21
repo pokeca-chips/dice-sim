@@ -12,12 +12,16 @@
 
 ## 公開 URL
 
-`main` への push または Pull Request 作成時に GitHub Actions で GitHub Pages に自動デプロイされます。
+GitHub Actions で `gh-pages` ブランチにデプロイします。
 
-- 本番: https://pokeca-chips.github.io/dice-sim/
-- PR では Checks タブからプレビュー URL を確認できます
+| 環境 | トリガー | URL |
+|------|---------|-----|
+| 本番 | `main` への push | https://pokeca-chips.github.io/dice-sim/ |
+| 開発 | Pull Request 作成・更新 | https://pokeca-chips.github.io/dice-sim/dev/ |
 
-初回はリポジトリの **Settings → Pages → Build and deployment → Source** を **GitHub Actions** に設定してください。
+PR では本番サイトを更新せず、`/dev/` にのみデプロイされます。PR に開発プレビュー URL のコメントも自動投稿されます。
+
+初回はリポジトリの **Settings → Pages → Build and deployment → Source** を **Deploy from a branch** にし、Branch を **`gh-pages` / `/ (root)`** に設定してください。
 
 ## 使い方
 
