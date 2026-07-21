@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ダイスシミュレーター</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>ダイスシミュレーター</h1>
+      <p class="subtitle">4個以上のダイスを使うゲーム向けシミュレーター</p>
+    </header>
+
+    <main class="main">
+      <section class="panel settings-panel">
+        <h2>設定</h2>
+        <div class="setting-row">
+          <label for="dice-count">ダイスの数</label>
+          <div class="dice-count-control">
+            <button type="button" id="dice-count-minus" aria-label="ダイスを減らす">−</button>
+            <output id="dice-count-display">4</output>
+            <button type="button" id="dice-count-plus" aria-label="ダイスを増やす">+</button>
+          </div>
+          <span class="hint">3〜10個</span>
+        </div>
+        <button type="button" id="roll-btn" class="btn btn-primary">ダイスを振る</button>
+        <button type="button" id="simulate-btn" class="btn btn-secondary">100回シミュレーション</button>
+      </section>
+
+      <section class="panel arena-panel">
+        <h2>盤面</h2>
+        <div id="dice-arena" class="dice-arena" aria-live="polite"></div>
+        <div id="roll-result" class="roll-result"></div>
+      </section>
+
+      <section class="panel editor-panel">
+        <h2>ダイス面のカスタマイズ</h2>
+        <p class="hint">各面に11種類のマークから選択できます。1面にマーク2個も設定可能（1ダイスあたり最大2面）。</p>
+        <div id="dice-editor" class="dice-editor"></div>
+      </section>
+
+      <section class="panel stats-panel">
+        <h2>シミュレーション結果</h2>
+        <p class="hint">100回振ったときのマーク種類ごとの平均出現数と、1回の振りで2個以上出た回数を表示します。</p>
+        <div id="stats-content" class="stats-content">
+          <p class="stats-placeholder">「100回シミュレーション」を実行してください</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
