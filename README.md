@@ -17,9 +17,9 @@ GitHub Actions で `gh-pages` ブランチにデプロイします。
 | 環境 | トリガー | URL |
 |------|---------|-----|
 | 本番 | `main` への push | https://pokeca-chips.github.io/dice-sim/ |
-| 開発 | Pull Request 作成・更新 | https://pokeca-chips.github.io/dice-sim/dev/ |
+| 開発 | Pull Request 作成・更新 | https://pokeca-chips.github.io/dice-sim/dev/pr-{番号}/ |
 
-PR では本番サイトを更新せず、`/dev/` にのみデプロイされます。PR に開発プレビュー URL のコメントも自動投稿されます。
+PR ごとに `/dev/pr-{番号}/` へデプロイされ、本番サイトは更新されません。PR に開発プレビュー URL のコメントも自動投稿されます。
 
 初回はリポジトリの **Settings → Pages → Build and deployment → Source** を **Deploy from a branch** にし、Branch を **`gh-pages` / `/ (root)`** に設定してください。
 
