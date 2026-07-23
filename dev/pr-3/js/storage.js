@@ -1,20 +1,33 @@
-import { createDefaultState, normalizeMarkId, MARKS } from './marks.js';
+import { createDefaultState, createDefaultDie, normalizeMarkId, MARKS } from './marks.js';
 
 const STORAGE_KEY = 'dice-simulator-state';
+const DEFAULTS_VERSION = 2;
 
 export function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return createDefaultState();
     const parsed = JSON.parse(raw);
-    return normalizeState(parsed);
+    // 初期ダイス構成を更新したバージョンでは、保存済みの旧デフォルトを置き換える
+    if (parsed?.defaultsVersion !== DEFAULTS_VERSION) {
+      const count = clamp(parsed?.diceCount ?? 4, 3, 10);
+      return withDefaultsVersion(createDefaultState(count));
+    }
+    return withDefaultsVersion(normalizeState(parsed));
   } catch {
-    return createDefaultState();
+    return withDefaultsVersion(createDefaultState());
   }
 }
 
 export function saveState(state) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(withDefaultsVersion(state))
+  );
+}
+
+function withDefaultsVersion(state) {
+  return { ...state, defaultsVersion: DEFAULTS_VERSION };
 }
 
 function normalizeMarks(marks) {
@@ -29,12 +42,12 @@ function normalizeState(parsed) {
   const dice = Array.isArray(parsed.dice) ? parsed.dice.slice(0, diceCount) : [];
 
   while (dice.length < diceCount) {
-    dice.push(createDefaultState(1).dice[0]);
+    dice.push(createDefaultDie());
   }
 
   dice.forEach((die, i) => {
     if (!die?.faces || die.faces.length !== 6) {
-      dice[i] = createDefaultState(1).dice[0];
+      dice[i] = createDefaultDie();
     } else {
       die.faces = die.faces.map((face) => ({
         marks: normalizeMarks(face.marks),

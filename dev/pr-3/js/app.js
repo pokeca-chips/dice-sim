@@ -3,6 +3,7 @@ import {
   MIN_DICE,
   MAX_DICE,
   MAX_DOUBLE_FACES,
+  FACE_DIRECTION_LABELS,
   createDefaultDie,
   countDoubleFaces,
   renderMark,
@@ -174,7 +175,7 @@ function renderEditor() {
   state.dice.forEach((die, dieIndex) => {
     const card = document.createElement('div');
     card.className = 'die-card';
-    card.innerHTML = `<h3>ダイス ${dieIndex + 1}</h3>`;
+    card.innerHTML = `<h3>ダイス ${dieIndex + 1}${dieIndex === 0 ? '（前後左右上下）' : ''}</h3>`;
 
     const facesGrid = document.createElement('div');
     facesGrid.className = 'faces-grid';
@@ -182,9 +183,10 @@ function renderEditor() {
     die.faces.forEach((face, faceIndex) => {
       const faceEl = document.createElement('div');
       faceEl.className = 'face-editor';
+      const direction = FACE_DIRECTION_LABELS[faceIndex] ?? `面 ${faceIndex + 1}`;
       faceEl.innerHTML = `
         <div class="face-preview">${renderFaceMarks(face.marks)}</div>
-        <span class="face-label">面 ${faceIndex + 1}</span>
+        <span class="face-label">${direction}</span>
       `;
 
       const controls = document.createElement('div');
