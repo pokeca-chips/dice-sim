@@ -87,6 +87,9 @@ export const MAX_DICE = 10;
 export const FACES_PER_DIE = 6;
 export const MAX_DOUBLE_FACES = 2;
 
+/** 3Dダイスの面クラス順（front, right, back, left, top, bottom）に対応 */
+export const FACE_DIRECTION_LABELS = ['前', '右', '後', '左', '上', '下'];
+
 export function normalizeMarkId(markId) {
   if (MARK_MAP[markId]) return markId;
   if (LEGACY_MARK_IDS[markId]) return LEGACY_MARK_IDS[markId];
@@ -97,18 +100,45 @@ export function createDefaultFace() {
   return { marks: [MARKS[0].id] };
 }
 
-export function createDefaultDie() {
+/** 全面が同じ色のダイス */
+export function createSolidDie(markId = MARKS[0].id) {
+  const id = normalizeMarkId(markId);
   return {
-    faces: Array.from({ length: FACES_PER_DIE }, (_, i) => ({
-      marks: [MARKS[i % MARKS.length].id],
+    faces: Array.from({ length: FACES_PER_DIE }, () => ({
+      marks: [id],
     })),
   };
 }
 
+/**
+ * 前後左右上下の6面がすべて異なる色のダイス。
+ * 面順は FACE_DIRECTION_LABELS と同じ。
+ */
+export function createSixPatternDie() {
+  return {
+    faces: Array.from({ length: FACES_PER_DIE }, (_, i) => ({
+      marks: [MARKS[i % FACES_PER_DIE].id],
+    })),
+  };
+}
+
+/** ダイス追加時のデフォルト（6面異色） */
+export function createDefaultDie() {
+  return createSixPatternDie();
+}
+
+/**
+ * 初期配置: 1個目だけ前後左右上下の6色パターン、
+ * 残りは単色（カスタマイズ前提のベース）。
+ */
 export function createDefaultState(diceCount = 4) {
+  const dice = Array.from({ length: diceCount }, (_, i) => {
+    if (i === 0) return createSixPatternDie();
+    return createSolidDie(MARKS[(i - 1) % MARKS.length].id);
+  });
   return {
     diceCount,
-    dice: Array.from({ length: diceCount }, () => createDefaultDie()),
+    dice,
     lastRoll: null,
   };
 }
