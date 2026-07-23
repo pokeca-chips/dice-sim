@@ -1,7 +1,14 @@
-import { createDefaultState, createDefaultDie, normalizeMarkId, MARKS } from './marks.js';
+import {
+  createDefaultState,
+  createDefaultDie,
+  createSixPatternDie,
+  ensureFixedDirectionDie,
+  normalizeMarkId,
+  MARKS,
+} from './marks.js';
 
 const STORAGE_KEY = 'dice-simulator-state';
-const DEFAULTS_VERSION = 2;
+const DEFAULTS_VERSION = 3;
 
 export function loadState() {
   try {
@@ -20,14 +27,22 @@ export function loadState() {
 }
 
 export function saveState(state) {
+  const fixed = {
+    ...state,
+    dice: ensureFixedDirectionDie(state.dice),
+  };
   localStorage.setItem(
     STORAGE_KEY,
-    JSON.stringify(withDefaultsVersion(state))
+    JSON.stringify(withDefaultsVersion(fixed))
   );
 }
 
 function withDefaultsVersion(state) {
-  return { ...state, defaultsVersion: DEFAULTS_VERSION };
+  return {
+    ...state,
+    dice: ensureFixedDirectionDie(state.dice),
+    defaultsVersion: DEFAULTS_VERSION,
+  };
 }
 
 function normalizeMarks(marks) {
@@ -46,6 +61,10 @@ function normalizeState(parsed) {
   }
 
   dice.forEach((die, i) => {
+    if (i === 0) {
+      dice[i] = createSixPatternDie();
+      return;
+    }
     if (!die?.faces || die.faces.length !== 6) {
       dice[i] = createDefaultDie();
     } else {
@@ -65,7 +84,7 @@ function normalizeState(parsed) {
 
   return {
     diceCount,
-    dice,
+    dice: ensureFixedDirectionDie(dice),
     lastRoll,
   };
 }
