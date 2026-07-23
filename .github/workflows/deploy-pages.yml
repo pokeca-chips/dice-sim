@@ -59,6 +59,18 @@ jobs:
           destination_dir: .
           keep_files: true
 
+      - name: Verify GitHub Pages is enabled
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ! gh api "repos/${{ github.repository }}/pages" >/dev/null 2>&1; then
+            echo "::error::GitHub Pages が未設定です。Settings → Pages で Source を Deploy from a branch → gh-pages / (root) に設定してください。"
+            echo "設定URL: https://github.com/${{ github.repository }}/settings/pages"
+            exit 1
+          fi
+          echo "GitHub Pages is enabled."
+          gh api "repos/${{ github.repository }}/pages" --jq '{status,html_url,source}'
+
   deploy-development:
     if: github.event_name == 'pull_request' && github.event.action != 'closed'
     needs: build
