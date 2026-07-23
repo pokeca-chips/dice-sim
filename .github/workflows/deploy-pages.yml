@@ -40,9 +40,8 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: https://pokeca-chips.github.io/dice-sim/
+    # github-pages environment のブランチ制限で main からのデプロイが
+    # 拒否されるため、environment は使わず直接 gh-pages へ公開する。
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
