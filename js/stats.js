@@ -62,14 +62,22 @@ export function runSimulation(dice, batchSize = SIMULATION_BATCH_SIZE, previous 
 export function rollOnce(dice) {
   return dice.map((die) => {
     const faceIndex = Math.floor(Math.random() * die.faces.length);
-    return { faceIndex, marks: [...die.faces[faceIndex].marks] };
+    const face = die.faces[faceIndex];
+    if (face?.direction) {
+      return { faceIndex, marks: [], direction: face.direction };
+    }
+    return {
+      faceIndex,
+      marks: Array.isArray(face?.marks) ? [...face.marks] : [],
+      direction: null,
+    };
   });
 }
 
 function countMarksInRoll(roll) {
   const counts = Object.fromEntries(MARKS.map((m) => [m.id, 0]));
   for (const result of roll) {
-    for (const markId of result.marks) {
+    for (const markId of result.marks || []) {
       if (counts[markId] !== undefined) counts[markId] += 1;
     }
   }

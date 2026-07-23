@@ -5,12 +5,12 @@ import {
   MAX_DOUBLE_FACES,
   FACE_DIRECTION_LABELS,
   createDefaultDie,
-  createSixPatternDie,
   ensureFixedDirectionDie,
   isFixedDirectionDie,
   countDoubleFaces,
   renderMark,
-  renderFaceMarks,
+  renderFaceContent,
+  renderDirectionLabel,
 } from './marks.js';
 import { loadState, saveState } from './storage.js';
 import {
@@ -128,19 +128,29 @@ function updateSimControls() {
 }
 
 function showRollResult(results) {
+  const parts = [];
+
+  for (const r of results) {
+    if (r.direction) {
+      parts.push(renderDirectionLabel(r.direction, 'sm'));
+    }
+  }
+
   const counts = {};
   for (const r of results) {
-    for (const markId of r.marks) {
+    for (const markId of r.marks || []) {
       counts[markId] = (counts[markId] || 0) + 1;
     }
   }
 
-  const summary = MARKS.filter((m) => counts[m.id])
-    .map((m) => `${renderMark(m.id)} ${m.name}: ${counts[m.id]}個`)
-    .join('　');
+  parts.push(
+    ...MARKS.filter((m) => counts[m.id]).map(
+      (m) => `${renderMark(m.id)} ${m.name}: ${counts[m.id]}個`
+    )
+  );
 
-  rollResult.innerHTML = summary
-    ? `<strong>出目:</strong> ${summary}`
+  rollResult.innerHTML = parts.length
+    ? `<strong>出目:</strong> ${parts.join('　')}`
     : '';
 }
 
@@ -195,7 +205,7 @@ function renderEditor() {
       faceEl.className = fixed ? 'face-editor face-editor-fixed' : 'face-editor';
       const direction = FACE_DIRECTION_LABELS[faceIndex] ?? `面 ${faceIndex + 1}`;
       faceEl.innerHTML = `
-        <div class="face-preview">${renderFaceMarks(face.marks)}</div>
+        <div class="face-preview">${renderFaceContent(face)}</div>
         <span class="face-label">${direction}</span>
       `;
 

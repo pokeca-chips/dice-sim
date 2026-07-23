@@ -4,11 +4,12 @@ import {
   createSixPatternDie,
   ensureFixedDirectionDie,
   normalizeMarkId,
+  FACE_DIRECTION_LABELS,
   MARKS,
 } from './marks.js';
 
 const STORAGE_KEY = 'dice-simulator-state';
-const DEFAULTS_VERSION = 3;
+const DEFAULTS_VERSION = 4;
 
 export function loadState() {
   try {
@@ -76,10 +77,17 @@ function normalizeState(parsed) {
 
   let lastRoll = null;
   if (Array.isArray(parsed.lastRoll)) {
-    lastRoll = parsed.lastRoll.map((r) => ({
-      faceIndex: typeof r?.faceIndex === 'number' ? r.faceIndex : 0,
-      marks: normalizeMarks(r?.marks),
-    }));
+    lastRoll = parsed.lastRoll.map((r) => {
+      const direction =
+        typeof r?.direction === 'string' && FACE_DIRECTION_LABELS.includes(r.direction)
+          ? r.direction
+          : null;
+      return {
+        faceIndex: typeof r?.faceIndex === 'number' ? r.faceIndex : 0,
+        marks: direction ? [] : normalizeMarks(r?.marks),
+        direction,
+      };
+    });
   }
 
   return {

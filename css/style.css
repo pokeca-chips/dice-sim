@@ -321,6 +321,27 @@ label,
   height: 2.2rem;
 }
 
+/* 前後左右上下の文字面 */
+.direction-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #1a2332;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.direction-sm { font-size: 1.1rem; }
+.direction-md { font-size: 1.5rem; }
+.direction-lg { font-size: 2.1rem; }
+
+.direction-result,
+.roll-result .direction-label {
+  color: var(--text);
+  font-weight: 700;
+}
+
 .face-marks {
   display: flex;
   align-items: center;
