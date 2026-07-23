@@ -381,8 +381,10 @@ body {
   font-size: 0.8rem;
 }
 
-.stats-table th.stats-num {
+.stats-table th.stats-num,
+.stats-table td.stats-num {
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .sort-btn {
@@ -400,7 +402,7 @@ body {
   justify-content: flex-start;
 }
 
-th.stats-num .sort-btn {
+.stats-table th.stats-num .sort-btn {
   text-align: right;
   justify-content: flex-end;
 }
@@ -425,11 +427,6 @@ th.stats-num .sort-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-}
-
-.stats-num {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 600px) {
