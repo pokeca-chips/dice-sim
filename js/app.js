@@ -5,6 +5,9 @@ import {
   MAX_DOUBLE_FACES,
   FACE_DIRECTION_LABELS,
   createDefaultDie,
+  createSixPatternDie,
+  ensureFixedDirectionDie,
+  isFixedDirectionDie,
   countDoubleFaces,
   renderMark,
   renderFaceMarks,
@@ -57,8 +60,11 @@ function changeDiceCount(delta) {
   if (next > state.diceCount) {
     state.dice.push(createDefaultDie());
   } else {
+    // ダイス1（固定）は残し、末尾から減らす
+    if (state.dice.length <= 1) return;
     state.dice.pop();
   }
+  state.dice = ensureFixedDirectionDie(state.dice);
   state.diceCount = next;
   state.lastRoll = null;
   persistAndRender();
@@ -173,51 +179,58 @@ function renderEditor() {
   diceEditor.innerHTML = '';
 
   state.dice.forEach((die, dieIndex) => {
+    const fixed = isFixedDirectionDie(dieIndex);
     const card = document.createElement('div');
-    card.className = 'die-card';
-    card.innerHTML = `<h3>ダイス ${dieIndex + 1}${dieIndex === 0 ? '（前後左右上下）' : ''}</h3>`;
+    card.className = fixed ? 'die-card die-card-fixed' : 'die-card';
+    card.innerHTML = fixed
+      ? `<h3>ダイス ${dieIndex + 1}（前後左右上下・固定）</h3>
+         <p class="die-fixed-hint">このダイスは編集できません</p>`
+      : `<h3>ダイス ${dieIndex + 1}</h3>`;
 
     const facesGrid = document.createElement('div');
     facesGrid.className = 'faces-grid';
 
     die.faces.forEach((face, faceIndex) => {
       const faceEl = document.createElement('div');
-      faceEl.className = 'face-editor';
+      faceEl.className = fixed ? 'face-editor face-editor-fixed' : 'face-editor';
       const direction = FACE_DIRECTION_LABELS[faceIndex] ?? `面 ${faceIndex + 1}`;
       faceEl.innerHTML = `
         <div class="face-preview">${renderFaceMarks(face.marks)}</div>
         <span class="face-label">${direction}</span>
       `;
 
-      const controls = document.createElement('div');
-      controls.className = 'mark-controls';
+      if (!fixed) {
+        const controls = document.createElement('div');
+        controls.className = 'mark-controls';
 
-      face.marks.forEach((markId, markIndex) => {
-        const select = createMarkSelect(markId, dieIndex, faceIndex, markIndex);
-        controls.appendChild(select);
+        face.marks.forEach((markId, markIndex) => {
+          const select = createMarkSelect(markId, dieIndex, faceIndex, markIndex);
+          controls.appendChild(select);
 
-        if (face.marks.length === 2) {
-          const removeBtn = document.createElement('button');
-          removeBtn.type = 'button';
-          removeBtn.className = 'btn-icon';
-          removeBtn.textContent = '−';
-          removeBtn.title = 'マークを削除';
-          removeBtn.addEventListener('click', () => removeMark(dieIndex, faceIndex, markIndex));
-          controls.appendChild(removeBtn);
+          if (face.marks.length === 2) {
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn-icon';
+            removeBtn.textContent = '−';
+            removeBtn.title = 'マークを削除';
+            removeBtn.addEventListener('click', () => removeMark(dieIndex, faceIndex, markIndex));
+            controls.appendChild(removeBtn);
+          }
+        });
+
+        if (face.marks.length < 2 && countDoubleFaces(die) < MAX_DOUBLE_FACES) {
+          const addBtn = document.createElement('button');
+          addBtn.type = 'button';
+          addBtn.className = 'btn-icon';
+          addBtn.textContent = '+';
+          addBtn.title = 'マークを追加';
+          addBtn.addEventListener('click', () => addMark(dieIndex, faceIndex));
+          controls.appendChild(addBtn);
         }
-      });
 
-      if (face.marks.length < 2 && countDoubleFaces(die) < MAX_DOUBLE_FACES) {
-        const addBtn = document.createElement('button');
-        addBtn.type = 'button';
-        addBtn.className = 'btn-icon';
-        addBtn.textContent = '+';
-        addBtn.title = 'マークを追加';
-        addBtn.addEventListener('click', () => addMark(dieIndex, faceIndex));
-        controls.appendChild(addBtn);
+        faceEl.appendChild(controls);
       }
 
-      faceEl.appendChild(controls);
       facesGrid.appendChild(faceEl);
     });
 
@@ -237,6 +250,7 @@ function createMarkSelect(currentId, dieIndex, faceIndex, markIndex) {
     select.appendChild(opt);
   });
   select.addEventListener('change', () => {
+    if (isFixedDirectionDie(dieIndex)) return;
     state.dice[dieIndex].faces[faceIndex].marks[markIndex] = select.value;
     persistAndRender();
   });
@@ -244,6 +258,7 @@ function createMarkSelect(currentId, dieIndex, faceIndex, markIndex) {
 }
 
 function addMark(dieIndex, faceIndex) {
+  if (isFixedDirectionDie(dieIndex)) return;
   const die = state.dice[dieIndex];
   if (countDoubleFaces(die) >= MAX_DOUBLE_FACES) return;
   const face = die.faces[faceIndex];
@@ -253,6 +268,7 @@ function addMark(dieIndex, faceIndex) {
 }
 
 function removeMark(dieIndex, faceIndex, markIndex) {
+  if (isFixedDirectionDie(dieIndex)) return;
   const face = state.dice[dieIndex].faces[faceIndex];
   if (face.marks.length <= 1) return;
   face.marks.splice(markIndex, 1);
@@ -260,6 +276,7 @@ function removeMark(dieIndex, faceIndex, markIndex) {
 }
 
 function persist() {
+  state.dice = ensureFixedDirectionDie(state.dice);
   saveState(state);
 }
 

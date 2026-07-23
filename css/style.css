@@ -353,6 +353,17 @@ label,
   color: var(--text-muted);
 }
 
+.die-card-fixed {
+  border-style: dashed;
+  opacity: 0.95;
+}
+
+.die-fixed-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: -0.4rem 0 0.75rem;
+}
+
 .faces-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

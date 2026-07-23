@@ -111,7 +111,7 @@ export function createSolidDie(markId = MARKS[0].id) {
 }
 
 /**
- * 前後左右上下の6面がすべて異なる色のダイス。
+ * 前後左右上下の6面がすべて異なる色のダイス（ダイス1固定用）。
  * 面順は FACE_DIRECTION_LABELS と同じ。
  */
 export function createSixPatternDie() {
@@ -122,22 +122,40 @@ export function createSixPatternDie() {
   };
 }
 
-/** ダイス追加時のデフォルト（6面異色） */
+/** カスタマイズ可能なダイスの追加時デフォルト（単色） */
 export function createDefaultDie() {
-  return createSixPatternDie();
+  return createSolidDie(MARKS[0].id);
+}
+
+/** ダイス1（index 0）は前後左右上下パターンに固定 */
+export const FIXED_DIRECTION_DIE_INDEX = 0;
+
+export function isFixedDirectionDie(dieIndex) {
+  return dieIndex === FIXED_DIRECTION_DIE_INDEX;
+}
+
+/** ダイス1を固定パターンで上書きした配列を返す */
+export function ensureFixedDirectionDie(dice) {
+  if (!Array.isArray(dice) || dice.length === 0) {
+    return [createSixPatternDie()];
+  }
+  const next = dice.slice();
+  next[FIXED_DIRECTION_DIE_INDEX] = createSixPatternDie();
+  return next;
 }
 
 /**
- * 初期配置: 1個目だけ前後左右上下の6色パターン、
+ * 初期配置: 1個目は前後左右上下の固定6色パターン、
  * 残りは単色（カスタマイズ前提のベース）。
  */
 export function createDefaultState(diceCount = 4) {
-  const dice = Array.from({ length: diceCount }, (_, i) => {
-    if (i === 0) return createSixPatternDie();
+  const count = Math.max(MIN_DICE, diceCount);
+  const dice = Array.from({ length: count }, (_, i) => {
+    if (isFixedDirectionDie(i)) return createSixPatternDie();
     return createSolidDie(MARKS[(i - 1) % MARKS.length].id);
   });
   return {
-    diceCount,
+    diceCount: count,
     dice,
     lastRoll: null,
   };
