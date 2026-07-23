@@ -381,6 +381,46 @@ body {
   font-size: 0.8rem;
 }
 
+.stats-table th.stats-num {
+  text-align: right;
+}
+
+.sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+th.stats-num .sort-btn {
+  text-align: right;
+  justify-content: flex-end;
+}
+
+.sort-btn:hover,
+.sort-btn.is-active {
+  color: var(--text);
+}
+
+.sort-indicator {
+  display: inline-block;
+  min-width: 0.75em;
+  font-size: 0.7em;
+  opacity: 0.35;
+}
+
+.sort-indicator.is-active {
+  opacity: 1;
+}
+
 .stats-mark {
   display: flex;
   align-items: center;
