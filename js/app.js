@@ -9,7 +9,7 @@ import {
   renderFaceMarks,
 } from './marks.js';
 import { loadState, saveState } from './storage.js';
-import { runSimulation, rollOnce, renderStats } from './stats.js';
+import { runSimulation, rollOnce, mountStatsTable } from './stats.js';
 import { createDiceElement, rollDice, setInitialRotation } from './dice.js';
 
 let state = loadState();
@@ -74,7 +74,7 @@ function handleSimulate() {
 
   requestAnimationFrame(() => {
     const stats = runSimulation(state.dice);
-    statsContent.innerHTML = renderStats(stats);
+    mountStatsTable(statsContent, stats);
     simulateBtn.disabled = false;
     simulateBtn.textContent = '100回シミュレーション';
   });
