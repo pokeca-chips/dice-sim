@@ -1,0 +1,114 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: pages-${{ github.event.pull_request.number || 'production' }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare site files
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp -r css js _site/
+          cp .nojekyll _site/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: _site
+
+  deploy-production:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: https://pokeca-chips.github.io/dice-sim/
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: _site
+
+      - name: Deploy to production
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          publish_branch: gh-pages
+          destination_dir: .
+          keep_files: true
+
+  deploy-development:
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: development
+      url: https://pokeca-chips.github.io/dice-sim/dev/pr-${{ github.event.pull_request.number }}/
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: _site
+
+      - name: Deploy to development
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_site
+          publish_branch: gh-pages
+          destination_dir: dev/pr-${{ github.event.pull_request.number }}
+          keep_files: true
+
+      - name: Comment development URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const url = `https://pokeca-chips.github.io/dice-sim/dev/pr-${prNumber}/`;
+            const body = `🧪 開発プレビュー (PR #${prNumber}): ${url}\n\n本番サイト（\`main\`）には影響しません。`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const marker = '<!-- dice-sim-dev-preview -->';
+            const existing = comments.find((c) => c.body?.includes(marker));
+            const fullBody = `${marker}\n${body}`;
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: fullBody,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: fullBody,
+              });
+            }
