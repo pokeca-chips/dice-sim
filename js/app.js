@@ -9,26 +9,36 @@ import {
   renderFaceMarks,
 } from './marks.js';
 import { loadState, saveState } from './storage.js';
-import { runSimulation, rollOnce, mountStatsTable } from './stats.js';
+import {
+  runSimulation,
+  rollOnce,
+  mountStatsTable,
+  SIMULATION_BATCH_SIZE,
+} from './stats.js';
 import { createDiceElement, rollDice, setInitialRotation } from './dice.js';
 
 let state = loadState();
 let isRolling = false;
 let cubeElements = [];
+let simulationStats = null;
+let statsTable = null;
 
 const diceCountDisplay = document.getElementById('dice-count-display');
 const diceCountMinus = document.getElementById('dice-count-minus');
 const diceCountPlus = document.getElementById('dice-count-plus');
 const rollBtn = document.getElementById('roll-btn');
 const simulateBtn = document.getElementById('simulate-btn');
+const resetSimBtn = document.getElementById('reset-sim-btn');
 const diceArena = document.getElementById('dice-arena');
 const rollResult = document.getElementById('roll-result');
 const diceEditor = document.getElementById('dice-editor');
 const statsContent = document.getElementById('stats-content');
+const statsHint = document.getElementById('stats-hint');
 
 function init() {
   renderAll();
   bindEvents();
+  updateSimControls();
 }
 
 function bindEvents() {
@@ -36,6 +46,7 @@ function bindEvents() {
   diceCountPlus.addEventListener('click', () => changeDiceCount(1));
   rollBtn.addEventListener('click', handleRoll);
   simulateBtn.addEventListener('click', handleSimulate);
+  resetSimBtn.addEventListener('click', handleResetSimulation);
 }
 
 function changeDiceCount(delta) {
@@ -73,11 +84,40 @@ function handleSimulate() {
   simulateBtn.textContent = '計算中...';
 
   requestAnimationFrame(() => {
-    const stats = runSimulation(state.dice);
-    mountStatsTable(statsContent, stats);
+    const sort = statsTable?.getSort() ?? { key: 'color', dir: 'asc' };
+    simulationStats = runSimulation(state.dice, SIMULATION_BATCH_SIZE, simulationStats);
+    statsTable = mountStatsTable(statsContent, simulationStats, sort);
     simulateBtn.disabled = false;
-    simulateBtn.textContent = '100回シミュレーション';
+    updateSimControls();
   });
+}
+
+function handleResetSimulation() {
+  clearSimulation();
+  updateSimControls();
+}
+
+function clearSimulation() {
+  simulationStats = null;
+  statsTable = null;
+  statsContent.innerHTML =
+    '<p class="stats-placeholder">「100回シミュレーション」を実行してください</p>';
+}
+
+function updateSimControls() {
+  const hasStats = Boolean(simulationStats?.rounds);
+  resetSimBtn.disabled = !hasStats;
+  simulateBtn.textContent = hasStats
+    ? `+${SIMULATION_BATCH_SIZE}回追加`
+    : `${SIMULATION_BATCH_SIZE}回シミュレーション`;
+
+  if (hasStats) {
+    statsHint.textContent =
+      `累計 ${simulationStats.rounds} 回分の結果です。さらに ${SIMULATION_BATCH_SIZE} 回ずつ追加できます。`;
+  } else {
+    statsHint.textContent =
+      `${SIMULATION_BATCH_SIZE}回ずつ追加でシミュレーションできます。色ごとの平均出現数と、1回の振りで2個以上出た回数を表示します。`;
+  }
 }
 
 function showRollResult(results) {
@@ -222,8 +262,10 @@ function persist() {
 }
 
 function persistAndRender() {
+  clearSimulation();
   persist();
   renderAll();
+  updateSimControls();
 }
 
 init();

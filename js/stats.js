@@ -1,6 +1,6 @@
 import { MARKS, renderMark } from './marks.js';
 
-const SIMULATION_ROUNDS = 100;
+export const SIMULATION_BATCH_SIZE = 100;
 
 const SORT_KEYS = {
   color: {
@@ -17,27 +17,46 @@ const SORT_KEYS = {
   },
 };
 
-export function runSimulation(dice) {
-  const totals = Object.fromEntries(MARKS.map((m) => [m.id, 0]));
-  const twoPlus = Object.fromEntries(MARKS.map((m) => [m.id, 0]));
+export function createEmptySimulation() {
+  return {
+    rounds: 0,
+    totals: Object.fromEntries(MARKS.map((m) => [m.id, 0])),
+    twoPlusCounts: Object.fromEntries(MARKS.map((m) => [m.id, 0])),
+    averages: Object.fromEntries(MARKS.map((m) => [m.id, 0])),
+  };
+}
 
-  for (let round = 0; round < SIMULATION_ROUNDS; round++) {
+/**
+ * シミュレーションを実行する。previous を渡すと結果を累積する。
+ */
+export function runSimulation(dice, batchSize = SIMULATION_BATCH_SIZE, previous = null) {
+  const stats = previous
+    ? {
+        rounds: previous.rounds,
+        totals: { ...previous.totals },
+        twoPlusCounts: { ...previous.twoPlusCounts },
+      }
+    : {
+        rounds: 0,
+        totals: Object.fromEntries(MARKS.map((m) => [m.id, 0])),
+        twoPlusCounts: Object.fromEntries(MARKS.map((m) => [m.id, 0])),
+      };
+
+  for (let round = 0; round < batchSize; round++) {
     const counts = countMarksInRoll(rollOnce(dice));
     for (const mark of MARKS) {
-      totals[mark.id] += counts[mark.id];
+      stats.totals[mark.id] += counts[mark.id];
       if (counts[mark.id] >= 2) {
-        twoPlus[mark.id] += 1;
+        stats.twoPlusCounts[mark.id] += 1;
       }
     }
   }
 
-  return {
-    rounds: SIMULATION_ROUNDS,
-    averages: Object.fromEntries(
-      MARKS.map((m) => [m.id, totals[m.id] / SIMULATION_ROUNDS])
-    ),
-    twoPlusCounts: twoPlus,
-  };
+  stats.rounds += batchSize;
+  stats.averages = Object.fromEntries(
+    MARKS.map((m) => [m.id, stats.totals[m.id] / stats.rounds])
+  );
+  return stats;
 }
 
 export function rollOnce(dice) {
@@ -118,6 +137,7 @@ export function renderStats(stats, sort = { key: 'color', dir: 'asc' }) {
     .join('');
 
   return `
+    <p class="stats-summary">累計試行回数: <strong>${stats.rounds}</strong> 回</p>
     <table class="stats-table">
       <thead>
         <tr>${headerCells}</tr>
@@ -142,7 +162,6 @@ export function mountStatsTable(container, stats, initialSort = { key: 'color', 
         if (sort.key === key) {
           sort = { key, dir: sort.dir === 'asc' ? 'desc' : 'asc' };
         } else {
-          // 数値列は降順、色名は昇順から開始
           sort = { key, dir: key === 'color' ? 'asc' : 'desc' };
         }
         paint();
