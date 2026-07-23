@@ -161,6 +161,29 @@ body {
   background: var(--border);
 }
 
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.btn-row .btn {
+  margin-right: 0;
+  margin-top: 0;
+}
+
 .btn-icon {
   width: 28px;
   height: 28px;
@@ -360,6 +383,17 @@ body {
 .stats-placeholder {
   color: var(--text-muted);
   font-style: italic;
+}
+
+.stats-summary {
+  margin-bottom: 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.stats-summary strong {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
 }
 
 .stats-table {

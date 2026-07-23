@@ -26,7 +26,10 @@
           <span class="hint">3〜10個</span>
         </div>
         <button type="button" id="roll-btn" class="btn btn-primary">ダイスを振る</button>
-        <button type="button" id="simulate-btn" class="btn btn-secondary">100回シミュレーション</button>
+        <div class="btn-row">
+          <button type="button" id="simulate-btn" class="btn btn-secondary">100回シミュレーション</button>
+          <button type="button" id="reset-sim-btn" class="btn btn-ghost" disabled>リセット</button>
+        </div>
       </section>
 
       <section class="panel arena-panel">
@@ -43,7 +46,7 @@
 
       <section class="panel stats-panel">
         <h2>シミュレーション結果</h2>
-        <p class="hint">100回振ったときの色ごとの平均出現数と、1回の振りで2個以上出た回数を表示します。</p>
+        <p class="hint" id="stats-hint">100回ずつ追加でシミュレーションできます。色ごとの平均出現数と、1回の振りで2個以上出た回数を表示します。</p>
         <div id="stats-content" class="stats-content">
           <p class="stats-placeholder">「100回シミュレーション」を実行してください</p>
         </div>
