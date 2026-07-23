@@ -1,4 +1,4 @@
-import { MARKS } from './marks.js';
+import { MARKS, renderMark } from './marks.js';
 
 const SIMULATION_ROUNDS = 100;
 
@@ -49,7 +49,7 @@ export function renderStats(stats) {
     return `
       <tr>
         <td class="stats-mark">
-          <span class="mark" style="color:${mark.color}">${mark.symbol}</span>
+          ${renderMark(mark.id)}
           <span>${mark.name}</span>
         </td>
         <td class="stats-num">${avg.toFixed(2)}</td>
