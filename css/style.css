@@ -20,12 +20,33 @@
   padding: 0;
 }
 
+html {
+  /* ダブルタップによる拡大を無効化（ピンチズームは維持） */
+  touch-action: manipulation;
+}
+
 body {
   font-family: 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
   min-height: 100vh;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+button,
+a,
+input,
+select,
+textarea,
+label,
+.btn,
+.btn-icon,
+.sort-btn,
+.dice-count-control button {
+  touch-action: manipulation;
 }
 
 .app {
