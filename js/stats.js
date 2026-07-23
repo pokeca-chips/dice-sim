@@ -62,7 +62,7 @@ export function renderStats(stats) {
     <table class="stats-table">
       <thead>
         <tr>
-          <th>マーク</th>
+          <th>色</th>
           <th>平均出現数</th>
           <th>2個以上の回数</th>
         </tr>

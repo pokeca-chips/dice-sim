@@ -190,7 +190,7 @@ function createMarkSelect(currentId, dieIndex, faceIndex, markIndex) {
   MARKS.forEach((mark) => {
     const opt = document.createElement('option');
     opt.value = mark.id;
-    opt.textContent = `${mark.symbol} ${mark.name}`;
+    opt.textContent = mark.name;
     if (mark.id === currentId) opt.selected = true;
     select.appendChild(opt);
   });

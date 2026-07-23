@@ -1,4 +1,4 @@
-import { createDefaultState } from './marks.js';
+import { createDefaultState, normalizeMarkId, MARKS } from './marks.js';
 
 const STORAGE_KEY = 'dice-simulator-state';
 
@@ -17,6 +17,13 @@ export function saveState(state) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+function normalizeMarks(marks) {
+  if (!Array.isArray(marks) || marks.length === 0) {
+    return [MARKS[0].id];
+  }
+  return marks.slice(0, 2).map(normalizeMarkId);
+}
+
 function normalizeState(parsed) {
   const diceCount = clamp(parsed.diceCount ?? 4, 3, 10);
   const dice = Array.isArray(parsed.dice) ? parsed.dice.slice(0, diceCount) : [];
@@ -30,15 +37,23 @@ function normalizeState(parsed) {
       dice[i] = createDefaultState(1).dice[0];
     } else {
       die.faces = die.faces.map((face) => ({
-        marks: Array.isArray(face.marks) ? face.marks.slice(0, 2) : ['circle'],
+        marks: normalizeMarks(face.marks),
       }));
     }
   });
 
+  let lastRoll = null;
+  if (Array.isArray(parsed.lastRoll)) {
+    lastRoll = parsed.lastRoll.map((r) => ({
+      faceIndex: typeof r?.faceIndex === 'number' ? r.faceIndex : 0,
+      marks: normalizeMarks(r?.marks),
+    }));
+  }
+
   return {
     diceCount,
     dice,
-    lastRoll: Array.isArray(parsed.lastRoll) ? parsed.lastRoll : null,
+    lastRoll,
   };
 }
 
