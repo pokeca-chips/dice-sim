@@ -20,12 +20,33 @@
   padding: 0;
 }
 
+html {
+  /* ダブルタップによる拡大を無効化（ピンチズームは維持） */
+  touch-action: manipulation;
+}
+
 body {
   font-family: 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
   min-height: 100vh;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+button,
+a,
+input,
+select,
+textarea,
+label,
+.btn,
+.btn-icon,
+.sort-btn,
+.dice-count-control button {
+  touch-action: manipulation;
 }
 
 .app {
@@ -161,6 +182,29 @@ body {
   background: var(--border);
 }
 
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.btn-row .btn {
+  margin-right: 0;
+  margin-top: 0;
+}
+
 .btn-icon {
   width: 28px;
   height: 28px;
@@ -242,15 +286,40 @@ body {
   min-height: 2.5rem;
 }
 
-/* Marks */
+/* Marks — エネルギータイプ風の色付きアイコン */
 .mark {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
+  background: var(--mark-color, #888);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  border-radius: 22%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  vertical-align: middle;
+  flex-shrink: 0;
 }
 
-.mark-sm { font-size: 1rem; }
-.mark-md { font-size: 1.4rem; }
-.mark-lg { font-size: 2rem; }
+.mark-icon {
+  width: 68%;
+  height: 68%;
+  display: block;
+}
+
+.mark-sm {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.mark-md {
+  width: 1.55rem;
+  height: 1.55rem;
+}
+
+.mark-lg {
+  width: 2.2rem;
+  height: 2.2rem;
+}
 
 .face-marks {
   display: flex;
@@ -282,6 +351,17 @@ body {
   font-size: 0.95rem;
   margin-bottom: 0.75rem;
   color: var(--text-muted);
+}
+
+.die-card-fixed {
+  border-style: dashed;
+  opacity: 0.95;
+}
+
+.die-fixed-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: -0.4rem 0 0.75rem;
 }
 
 .faces-grid {
@@ -337,6 +417,17 @@ body {
   font-style: italic;
 }
 
+.stats-summary {
+  margin-bottom: 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.stats-summary strong {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
 .stats-table {
   width: 100%;
   border-collapse: collapse;
@@ -356,15 +447,52 @@ body {
   font-size: 0.8rem;
 }
 
+.stats-table th.stats-num,
+.stats-table td.stats-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+.stats-table th.stats-num .sort-btn {
+  text-align: right;
+  justify-content: flex-end;
+}
+
+.sort-btn:hover,
+.sort-btn.is-active {
+  color: var(--text);
+}
+
+.sort-indicator {
+  display: inline-block;
+  min-width: 0.75em;
+  font-size: 0.7em;
+  opacity: 0.35;
+}
+
+.sort-indicator.is-active {
+  opacity: 1;
+}
+
 .stats-mark {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-}
-
-.stats-num {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 600px) {

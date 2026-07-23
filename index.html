@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>ダイスシミュレーター</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -26,7 +26,10 @@
           <span class="hint">3〜10個</span>
         </div>
         <button type="button" id="roll-btn" class="btn btn-primary">ダイスを振る</button>
-        <button type="button" id="simulate-btn" class="btn btn-secondary">100回シミュレーション</button>
+        <div class="btn-row">
+          <button type="button" id="simulate-btn" class="btn btn-secondary">100回シミュレーション</button>
+          <button type="button" id="reset-sim-btn" class="btn btn-ghost" disabled>リセット</button>
+        </div>
       </section>
 
       <section class="panel arena-panel">
@@ -37,13 +40,13 @@
 
       <section class="panel editor-panel">
         <h2>ダイス面のカスタマイズ</h2>
-        <p class="hint">各面に11種類のマークから選択できます。1面にマーク2個も設定可能（1ダイスあたり最大2面）。</p>
+        <p class="hint">ダイス1は前後左右上下の固定パターンです。ダイス2以降は各面に11種類の色から選択でき、1面に色マーク2個も設定可能（1ダイスあたり最大2面）。</p>
         <div id="dice-editor" class="dice-editor"></div>
       </section>
 
       <section class="panel stats-panel">
         <h2>シミュレーション結果</h2>
-        <p class="hint">100回振ったときのマーク種類ごとの平均出現数と、1回の振りで2個以上出た回数を表示します。</p>
+        <p class="hint" id="stats-hint">100回ずつ追加でシミュレーションできます。色ごとの平均出現数と、1回の振りで2個以上出た回数を表示します。</p>
         <div id="stats-content" class="stats-content">
           <p class="stats-placeholder">「100回シミュレーション」を実行してください</p>
         </div>
