@@ -21,7 +21,15 @@ GitHub Actions で `gh-pages` ブランチにデプロイします。
 
 PR ごとに `/dev/pr-{番号}/` へデプロイされ、本番サイトは更新されません。PR に開発プレビュー URL のコメントも自動投稿されます。
 
-初回はリポジトリの **Settings → Pages → Build and deployment → Source** を **Deploy from a branch** にし、Branch を **`gh-pages` / `/ (root)`** に設定してください。
+### 初回セットアップ（必須）
+
+CI が `gh-pages` へファイルを push しても、**Pages を有効化しないと 404** になります。
+
+1. [Settings → Pages](https://github.com/pokeca-chips/dice-sim/settings/pages) を開く
+2. **Build and deployment → Source** を **Deploy from a branch** にする
+3. Branch を **`gh-pages`** / **`/ (root)`** にして Save
+
+有効化後、数分で https://pokeca-chips.github.io/dice-sim/ が配信されます。
 
 ## 使い方
 
