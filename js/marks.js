@@ -111,13 +111,14 @@ export function createSolidDie(markId = MARKS[0].id) {
 }
 
 /**
- * 前後左右上下の6面がすべて異なる色のダイス（ダイス1固定用）。
+ * 前後左右上下の文字面ダイス（ダイス1固定用）。
  * 面順は FACE_DIRECTION_LABELS と同じ。
  */
 export function createSixPatternDie() {
   return {
-    faces: Array.from({ length: FACES_PER_DIE }, (_, i) => ({
-      marks: [MARKS[i % FACES_PER_DIE].id],
+    faces: FACE_DIRECTION_LABELS.map((label) => ({
+      direction: label,
+      marks: [],
     })),
   };
 }
@@ -134,6 +135,10 @@ export function isFixedDirectionDie(dieIndex) {
   return dieIndex === FIXED_DIRECTION_DIE_INDEX;
 }
 
+export function isDirectionFace(face) {
+  return Boolean(face?.direction);
+}
+
 /** ダイス1を固定パターンで上書きした配列を返す */
 export function ensureFixedDirectionDie(dice) {
   if (!Array.isArray(dice) || dice.length === 0) {
@@ -145,7 +150,7 @@ export function ensureFixedDirectionDie(dice) {
 }
 
 /**
- * 初期配置: 1個目は前後左右上下の固定6色パターン、
+ * 初期配置: 1個目は前後左右上下の固定文字面、
  * 残りは単色（カスタマイズ前提のベース）。
  */
 export function createDefaultState(diceCount = 4) {
@@ -162,7 +167,7 @@ export function createDefaultState(diceCount = 4) {
 }
 
 export function countDoubleFaces(die) {
-  return die.faces.filter((f) => f.marks.length === 2).length;
+  return die.faces.filter((f) => !isDirectionFace(f) && f.marks.length === 2).length;
 }
 
 export function renderMark(markId, size = 'md') {
@@ -173,7 +178,21 @@ export function renderMark(markId, size = 'md') {
   return `<span class="mark mark-${size}" style="--mark-color:${mark.color}" title="${mark.name}">${svg}</span>`;
 }
 
+export function renderDirectionLabel(label, size = 'md') {
+  const safe = FACE_DIRECTION_LABELS.includes(label) ? label : '';
+  if (!safe) return '';
+  return `<span class="direction-label direction-${size}" title="${safe}">${safe}</span>`;
+}
+
 export function renderFaceMarks(marks, size = 'md') {
   const cls = marks.length === 2 ? 'face-marks double' : 'face-marks';
   return `<div class="${cls}">${marks.map((id) => renderMark(id, size)).join('')}</div>`;
+}
+
+/** 色マーク面または方向文字面を描画 */
+export function renderFaceContent(face, size = 'md') {
+  if (isDirectionFace(face)) {
+    return `<div class="face-marks">${renderDirectionLabel(face.direction, size)}</div>`;
+  }
+  return renderFaceMarks(face.marks || [], size);
 }
