@@ -91,7 +91,10 @@ function handleSimulate() {
   simulateBtn.textContent = '計算中...';
 
   requestAnimationFrame(() => {
-    const sort = statsTable?.getSort() ?? { key: 'color', dir: 'asc' };
+    const sort = statsTable?.getSort() ?? {
+      color: { key: 'color', dir: 'asc' },
+      direction: { key: 'direction', dir: 'asc' },
+    };
     simulationStats = runSimulation(state.dice, SIMULATION_BATCH_SIZE, simulationStats);
     statsTable = mountStatsTable(statsContent, simulationStats, sort);
     simulateBtn.disabled = false;
@@ -120,20 +123,21 @@ function updateSimControls() {
 
   if (hasStats) {
     statsHint.textContent =
-      `累計 ${simulationStats.rounds} 回分の結果です。さらに ${SIMULATION_BATCH_SIZE} 回ずつ追加できます。`;
+      `累計 ${simulationStats.rounds} 回分の結果です。さらに ${SIMULATION_BATCH_SIZE} 回ずつ追加できます。方向と色は別集計です。`;
   } else {
     statsHint.textContent =
-      `${SIMULATION_BATCH_SIZE}回ずつ追加でシミュレーションできます。色ごとの平均出現数と、1回の振りで2個以上出た回数を表示します。`;
+      `${SIMULATION_BATCH_SIZE}回ずつ追加でシミュレーションできます。方向（前後左右上下）と色は別集計で、平均出現数と2個以上出た回数を表示します。`;
   }
 }
 
 function showRollResult(results) {
-  const parts = [];
+  const sections = [];
 
-  for (const r of results) {
-    if (r.direction) {
-      parts.push(renderDirectionLabel(r.direction, 'sm'));
-    }
+  const dirParts = results
+    .filter((r) => r.direction)
+    .map((r) => renderDirectionLabel(r.direction, 'sm'));
+  if (dirParts.length) {
+    sections.push(`<span class="roll-group-label">方向</span> ${dirParts.join('　')}`);
   }
 
   const counts = {};
@@ -143,14 +147,15 @@ function showRollResult(results) {
     }
   }
 
-  parts.push(
-    ...MARKS.filter((m) => counts[m.id]).map(
-      (m) => `${renderMark(m.id)} ${m.name}: ${counts[m.id]}個`
-    )
+  const colorParts = MARKS.filter((m) => counts[m.id]).map(
+    (m) => `${renderMark(m.id)} ${m.name}: ${counts[m.id]}個`
   );
+  if (colorParts.length) {
+    sections.push(`<span class="roll-group-label">色</span> ${colorParts.join('　')}`);
+  }
 
-  rollResult.innerHTML = parts.length
-    ? `<strong>出目:</strong> ${parts.join('　')}`
+  rollResult.innerHTML = sections.length
+    ? `<strong>出目:</strong> ${sections.join(' ／ ')}`
     : '';
 }
 
