@@ -321,6 +321,38 @@ label,
   height: 2.2rem;
 }
 
+/* 前後左右上下の文字面 */
+.direction-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #1a2332;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.direction-sm { font-size: 1.1rem; }
+.direction-md { font-size: 1.5rem; }
+.direction-lg { font-size: 2.1rem; }
+
+.direction-stats-name {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.roll-group-label {
+  color: var(--text-muted);
+  font-size: 0.85em;
+  margin-right: 0.25rem;
+}
+
+.direction-result,
+.roll-result .direction-label {
+  color: var(--text);
+  font-weight: 700;
+}
+
 .face-marks {
   display: flex;
   align-items: center;
@@ -426,6 +458,19 @@ label,
 .stats-summary strong {
   color: var(--text);
   font-variant-numeric: tabular-nums;
+}
+
+.stats-section-title {
+  margin: 1.25rem 0 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.stats-section-hint {
+  margin: 0 0 0.6rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 .stats-table {

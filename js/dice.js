@@ -1,4 +1,4 @@
-import { renderFaceMarks } from './marks.js';
+import { renderFaceContent } from './marks.js';
 
 const FACE_ROTATIONS = [
   { x: 0, y: 0 },
@@ -23,7 +23,7 @@ export function createDiceElement(die, index) {
     const faceEl = document.createElement('div');
     faceEl.className = `dice-face ${FACE_CLASSES[faceIndex]}`;
     faceEl.dataset.faceIndex = faceIndex;
-    faceEl.innerHTML = renderFaceMarks(face.marks, 'lg');
+    faceEl.innerHTML = renderFaceContent(face, 'lg');
     cube.appendChild(faceEl);
   });
 
